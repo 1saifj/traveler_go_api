@@ -1,7 +1,9 @@
 package presenter
 
-import "taveler/infrastructure/model"
+import (
+	"taveler/infrastructure/model"
+)
 
 type PlacePresenter interface {
-	ResponsePlaces(places []*model.Place) ([]any, error)
+	ResponsePlaces(places []*model.Place) []any
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"taveler/config"
 	"taveler/infrastructure/datastore"
+	"taveler/registry"
 )
 
 func main() {
@@ -15,6 +16,7 @@ func main() {
 		panic(err)
 		return
 	}
+	_ = registry.NewRegistry()
 
 	listenForHosts(app, con.Hosts)
 
