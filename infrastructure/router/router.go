@@ -13,5 +13,5 @@ func SetupRouter(app *fiber.App, c *controller.AppController) {
 
 func setupControllerRouters(api fiber.Router, c *controller.AppController) {
 	setupPlaceRouter(api, *c)
-
+	setupSwaggerRouter(api, *c)
 }
