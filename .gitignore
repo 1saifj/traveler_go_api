@@ -1,3 +1,4 @@
 /taveler.db
 /access.log
 *.log
+.idea/dataSources.xml
