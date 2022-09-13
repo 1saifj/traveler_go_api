@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Category struct {
-	gorm.Model
-	Name   string  `json:"name"  gorm:"not null"`
-	Places []Place `json:"place"  gorm:"foreignKey:CategoryID"`
+	Model
+	Name  string `json:"name"  gorm:"not null"`
+	Image string `gorm:"type:varchar(255)" json:"image"`
 }

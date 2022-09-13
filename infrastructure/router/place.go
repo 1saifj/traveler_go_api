@@ -7,6 +7,6 @@ import (
 
 func setupPlaceRouter(api router.Party, c controller.PlaceController) {
 	place := api.Party("/place")
-	place.Post("/", c.CreatePlace)
-
+	place.Post("/create", c.CreatePlace)
+	place.Get("", c.FindAll)
 }
