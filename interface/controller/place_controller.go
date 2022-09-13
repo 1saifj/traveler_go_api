@@ -23,8 +23,19 @@ func NewPlaceController(i interactor.PlaceInteractor) PlaceController {
 }
 
 func (p *placeController) FindAll(ctx iris.Context) {
-	//TODO implement me
-	panic("implement me")
+	var filter parameter.Filter
+	err := ctx.ReadQuery(&filter)
+	if err != nil {
+		panic(err)
+		return
+	}
+	places, err := p.Interactor.FindAll(filter)
+	if err != nil {
+		panic(err)
+		return
+	}
+	ctx.JSON(places)
+
 }
 
 func (p *placeController) FindByID(ctx iris.Context) {
@@ -41,6 +52,7 @@ func (p *placeController) CreatePlace(ctx iris.Context) {
 	place, err := p.Interactor.CreatePlace(param)
 	if err != nil {
 		//ctx.StopWithError(iris.StatusBadRequest, err)
+		panic(err)
 		return
 	}
 	_, _ = ctx.JSON(place)

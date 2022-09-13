@@ -22,9 +22,8 @@ func (c *placePresenter) ResponsePlace(place model.Place) any {
 		"latitude":    place.Latitude,
 		"longitude":   place.Longitude,
 		"slug":        place.Slug,
-		"thumbnail":   place.Thumbnail,
 		"likes":       place.Likes,
-		"comments":    place.Comments,
+		"categoryId":  place.CategoryID,
 	}
 }
 
