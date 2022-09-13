@@ -1,31 +1,20 @@
 package config
 
 import (
-	"gopkg.in/yaml.v3"
-	"io"
+	"fmt"
 	"os"
 )
 
-func GetAppConfig() (*AppConfig, error) {
-	file, err := os.Open("config.yml")
-	if err != nil {
-		return nil, err
-	}
+func (db *DatabaseConfig) setConf() {
+	db.Host = os.Getenv("DB_HOST")
+	db.Username = os.Getenv("POSTGRES_USER")
+	db.Password = os.Getenv("POSTGRES_PASSWORD")
+	db.Name = os.Getenv("POSTGRES_NAME")
+	db.Port = os.Getenv("DB_PORT")
+}
 
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
+func (db *DatabaseConfig) GetDSN() string {
+	db.setConf()
+	return fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable TimeZone=Asia/Baghdad", db.Host, db.Username, db.Password, db.Name, db.Port)
 
-	var conf AppConfig
-	err = yaml.Unmarshal(bytes, &conf)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = file.Close(); err != nil {
-		return nil, err
-	}
-
-	return &conf, nil
 }

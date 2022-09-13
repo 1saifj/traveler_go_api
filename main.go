@@ -2,23 +2,44 @@ package main
 
 import (
 	"github.com/kataras/iris/v12"
-	"net/http"
-	"taveler/config"
+	"os"
 	"taveler/infrastructure/datastore"
+	"taveler/infrastructure/router"
 	"taveler/registry"
 )
 
+// @title           Swagger Example API
+// @version         1.0
+// @description
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api
+
 func main() {
+
+	db, err := datastore.SetupDB()
 	app := newApp()
-	con, err := config.GetAppConfig()
-	_, err = datastore.SetupDB(&con.DB)
+
 	if err != nil {
 		panic(err)
 		return
 	}
-	_ = registry.NewRegistry()
+	reg := &registry.Registry{
+		DB: db,
+	}
 
-	listenForHosts(app, con.Hosts)
+	router.SetupRouter(app.APIBuilder, reg.NewAppController())
+
+	hostPort := os.Getenv("HOST_PORT")
+	listen(app, hostPort)
 
 }
 func newApp() *iris.Application {
@@ -26,22 +47,8 @@ func newApp() *iris.Application {
 	return app
 }
 
-func listenForHosts(app *iris.Application, hosts []config.Host) {
-	for i := 0; i < len(hosts)-1; i++ {
-		host := hosts[i]
-		go listen(app, host)
-	}
-
-	host := hosts[len(hosts)-1]
-	err := app.Listen(host.GetHost())
-	if err != nil {
-		app.Logger().Error(err)
-		panic(err)
-	}
-}
-
-func listen(app *iris.Application, host config.Host) {
-	err := app.NewHost(&http.Server{Addr: host.GetHost()}).ListenAndServe()
+func listen(app *iris.Application, host string) {
+	err := app.Listen(host)
 	if err != nil {
 		app.Logger().Error(err)
 		panic(err)
