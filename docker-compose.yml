@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  traveler:
+    container_name: traveler-api
+    build: .
+    ports:
+      - "3000:8080"
+    restart: on-failure
+    volumes:
+      - .:/app
+    depends_on:
+      - postgresdb
+    networks:
+      - traveler-network
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - POSTGRES_NAME=${POSTGRES_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  postgresdb:
+    image: postgres:latest
+    container_name: postgresql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
+    networks:
+      - traveler-network
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    networks:
+      - traveler-network
+    volumes:
+      - redis:/data
+
+networks:
+  traveler-network:
+    driver: bridge
+
+volumes:
+  redis:
+    driver: local
