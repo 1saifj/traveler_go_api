@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/kataras/iris/v12"
-	"os"
+	"github.com/gofiber/fiber/v2"
 	"taveler/infrastructure/datastore"
 	"taveler/infrastructure/router"
 	"taveler/registry"
@@ -24,10 +23,8 @@ import (
 // @BasePath  /api
 
 func main() {
-
 	db, err := datastore.SetupDB()
-	app := newApp()
-
+	app := fiber.New()
 	if err != nil {
 		panic(err)
 		return
@@ -35,22 +32,11 @@ func main() {
 	reg := &registry.Registry{
 		DB: db,
 	}
-
-	router.SetupRouter(app.APIBuilder, reg.NewAppController())
-
-	hostPort := os.Getenv("HOST_PORT")
-	listen(app, hostPort)
-
-}
-func newApp() *iris.Application {
-	app := iris.Default()
-	return app
-}
-
-func listen(app *iris.Application, host string) {
-	err := app.Listen(host)
+	router.SetupRouter(app, reg.NewAppController())
+	//base := os.Getenv("HOST_PORT")
+	err = app.Listen("localhost:3000")
 	if err != nil {
-		app.Logger().Error(err)
 		panic(err)
 	}
+
 }

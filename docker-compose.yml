@@ -22,7 +22,7 @@ services:
 
   postgresdb:
     image: postgres:latest
-    container_name: postgresql
+    container_name: postgresql_traveler
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}

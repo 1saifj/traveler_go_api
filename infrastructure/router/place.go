@@ -1,12 +1,12 @@
 package router
 
 import (
-	"github.com/kataras/iris/v12/core/router"
+	"github.com/gofiber/fiber/v2"
 	"taveler/interface/controller"
 )
 
-func setupPlaceRouter(api router.Party, c controller.PlaceController) {
-	place := api.Party("/place")
+func setupPlaceRouter(api fiber.Router, c controller.PlaceController) {
+	place := api.Group("/place")
 	place.Post("/create", c.CreatePlace)
 	place.Get("", c.FindAll)
 }
