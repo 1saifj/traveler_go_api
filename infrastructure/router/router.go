@@ -1,17 +1,17 @@
 package router
 
 import (
-	"github.com/kataras/iris/v12/core/router"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"taveler/interface/controller"
 )
 
-func SetupRouter(builder *router.APIBuilder, c *controller.AppController) {
-	api := builder.Party("/api")
-
+func SetupRouter(app *fiber.App, c *controller.AppController) {
+	api := app.Group("/api", logger.New())
 	setupControllerRouters(api, c)
 }
 
-func setupControllerRouters(api router.Party, c *controller.AppController) {
+func setupControllerRouters(api fiber.Router, c *controller.AppController) {
 	setupPlaceRouter(api, *c)
-
+	setupSwaggerRouter(api, *c)
 }

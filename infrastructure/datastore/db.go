@@ -1,16 +1,16 @@
 package datastore
 
 import (
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"taveler/config"
 	"taveler/infrastructure/model"
 )
 
 func SetupDB() (*gorm.DB, error) {
 	var dialector gorm.Dialector
-	dbConfig := config.DatabaseConfig{}
-	dialector = postgres.Open(dbConfig.GetDSN())
+	//dbConfig := config.DatabaseConfig{}
+	//dialector = postgres.Open(dbConfig.GetDSN())
+	dialector = sqlite.Open("taveler.db")
 	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		return nil, err
