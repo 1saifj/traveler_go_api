@@ -23,5 +23,5 @@ func SetupDB() (*gorm.DB, error) {
 }
 
 func migrate(db *gorm.DB) error {
-	return db.AutoMigrate(model.Place{}, model.Category{}, model.Image{})
+	return db.AutoMigrate(model.Place{}, model.Category{}, model.Image{}, model.User{})
 }
