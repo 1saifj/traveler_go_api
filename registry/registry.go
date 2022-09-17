@@ -12,5 +12,6 @@ type Registry struct {
 func (r *Registry) NewAppController() *controller.AppController {
 	return &controller.AppController{
 		PlaceController: r.NewPlaceController(),
+		UserController:  r.NewUserController(),
 	}
 }

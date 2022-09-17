@@ -15,6 +15,7 @@ type UserRepository interface {
 	CreateUser(user *model.User) (*model.User, error)
 	UpdateUser(user *model.User) (*model.User, error)
 	DeleteUser(id int) error
+	UserExists(email string) (bool, error)
 }
 
 func NewUserRepository(db *gorm.DB) UserRepository {
@@ -62,4 +63,13 @@ func (u *userRepository) DeleteUser(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (u *userRepository) UserExists(email string) (bool, error) {
+	var user model.User
+	err := u.db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }

@@ -6,12 +6,19 @@ import (
 	"taveler/infrastructure/model"
 )
 
+var (
+	DB *gorm.DB
+)
+
 func SetupDB() (*gorm.DB, error) {
 	var dialector gorm.Dialector
 	//dbConfig := config.DatabaseConfig{}
 	//dialector = postgres.Open(dbConfig.GetDSN())
 	dialector = sqlite.Open("taveler.db")
-	db, err := gorm.Open(dialector, &gorm.Config{})
+	db, err := gorm.Open(dialector, &gorm.Config{
+		//uuid support
+
+	})
 	if err != nil {
 		return nil, err
 	}

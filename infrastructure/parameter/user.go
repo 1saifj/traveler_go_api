@@ -1,6 +1,6 @@
 package parameter
 
 type SignUp struct {
-	Email    string `json:"email"  form:"email"    validate:"required,email"`
-	Password string `json:"password" binding:"required" form:"password" validate:"required"`
+	Email    string `json:"email"  form:"email" validate:"required,email"`
+	Password string `json:"password"  form:"password" validate:"required"`
 }
