@@ -4,13 +4,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"log"
 	"os"
 	_ "taveler/docs"
 	"taveler/infrastructure/datastore"
-	"taveler/infrastructure/model"
 	"taveler/infrastructure/router"
-	"taveler/infrastructure/utils"
-	"taveler/interface/middlewares"
 	"taveler/registry"
 )
 
@@ -27,6 +25,7 @@ import (
 func main() {
 	db, err := datastore.SetupDB()
 	app := fiber.New()
+	app.Static("/public", "./public")
 	if err != nil {
 		panic(err)
 		return
@@ -46,37 +45,9 @@ func main() {
 		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
 	}))
 
-	app.All("/api/auth/*", middlewares.MustAuth, func(c *fiber.Ctx) error {
-		session, err := datastore.SessionStore.Get(c)
-		if err != nil {
-			return c.Status(500).JSON("Failed to connect to sessions")
-		}
-		uid := session.Get("uid")
-		if uid == nil {
-			return c.Status(500).JSON("Not logged in")
-		}
-
-		user := new(model.User)
-		result := db.Where("id = ?", uid).First(user)
-		if result.Error != nil {
-			_ = session.Destroy()
-			_ = session.Save()
-			return c.Status(500).JSON("User not found")
-		}
-
-		if user.State != "Active" {
-			return c.Status(401).JSON("User state must be active")
-		}
-		jwtToken, err := utils.GenerateJWT(user)
-		if err != nil {
-			return c.Status(500).JSON("Failed to generate token")
-		}
-
-		jwtToken = "Bearer " + jwtToken
-		c.Set("Authorization", jwtToken)
-
-		return c.SendStatus(200)
-	})
+	if err != nil {
+		log.Fatal("Could not initialize JWT Role Authorizer")
+	}
 
 	base := os.Getenv("APP_ADDR")
 	err = app.Listen(base)

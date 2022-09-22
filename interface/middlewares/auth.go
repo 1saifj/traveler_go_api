@@ -1,80 +1,64 @@
 package middlewares
 
 import (
+	"github.com/casbin/casbin/v2"
 	"github.com/gofiber/fiber/v2"
-	"strings"
-	"taveler/infrastructure/datastore"
-	"taveler/infrastructure/model"
+	"log"
+	"net/http"
+	jwt_utils "taveler/infrastructure/utils"
 )
 
-func MustAuth(c *fiber.Ctx) error {
-	path := strings.Replace(c.Path(), "/api/auth", "", 1)
-	if strings.Contains(path, "/api/v2/myauth/identity") || strings.Contains(path, "/api/v2/myauth/public") || strings.Contains(path, "api/v2/product/public") {
-		return c.SendStatus(200)
-	}
-	session, err := datastore.SessionStore.Get(c)
-
-	if err != nil {
-		return c.Status(500).JSON("Failed to connect to sessions")
-	}
-	uid := session.Get("uid")
-	if uid == nil {
-		return c.Status(401).JSON("Not logged in")
-	}
-	user := new(model.User)
-	result := datastore.DB.Where("id = ?", uid).First(user)
-	if result.Error != nil {
-		session.Destroy()
-		session.Save()
-		return c.Status(401).JSON("User not found")
-	}
-	return c.Next()
+// JWTRoleAuthorizer is a sturcture for a Role Authorizer type
+type JWTRoleAuthorizer struct {
+	enforcer   *casbin.Enforcer
+	SigningKey []byte
+	//	logger     logger.Logger
 }
 
-//func MustPending(c *fiber.Ctx) error {
-//	user := c.Locals("CurrentUser").(*models.User)
-//
-//	if user.State != "Pending" {
-//		return c.Status(422).JSON("User state must be pending")
-//	}
-//
-//	return c.Next()
-//}
-//
-//func MustGuest(c *fiber.Ctx) error {
-//	session, err := config.SessionStore.Get(c)
-//
-//	if err != nil {
-//		return c.Status(500).JSON(controllers.FailedConnectToSessions)
-//	}
-//
-//	uid := session.Get("uid")
-//
-//	if uid == nil {
-//		return c.Next()
-//	}
-//
-//	return c.Status(422).JSON("Must be guest")
-//}
-//
-//func CheckRequest(c *fiber.Ctx) error {
-//	jwt_auth, err := utils.CheckJWT(strings.Replace(c.Get("Authorization"), "Bearer ", "", -1))
-//
-//	if err != nil {
-//		return c.Status(500).JSON(controllers.FailedToParseJWT)
-//	}
-//
-//	user := new(models.User)
-//
-//	if err := collection.User.FindOne(context.Background(), bson.M{"uid": jwt_auth.UID}).Decode(&user); err != nil {
-//		return c.Status(500).JSON(controllers.ServerInternalError)
-//	}
-//
-//	if len(user.Email) == 0 {
-//		return c.Status(500).JSON(controllers.ServerInternalError)
-//	}
-//
-//	c.Locals("CurrentUser", user)
-//
-//	return c.Next()
-//}
+const CasbinConfigPath = "./config/rbac_model.conf"
+const MiddlewareRolesPath = "./config/models.csv"
+const JWTSecretKey = "secret"
+
+func NewJWTRoleAuthorizer(MiddlewareRolesPath interface{}) (*JWTRoleAuthorizer, error) {
+	enforcer, err := casbin.NewEnforcer(CasbinConfigPath, MiddlewareRolesPath)
+	if err != nil {
+		log.Fatal("could not initialize new enforcer:", err.Error())
+		return nil, err
+	}
+
+	return &JWTRoleAuthorizer{
+		enforcer:   enforcer,
+		SigningKey: []byte(JWTSecretKey),
+		//		logger:     logger,
+	}, nil
+}
+
+func NewAuthorizer(jwtra *JWTRoleAuthorizer) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		accessToken := ctx.Get("Authorization")
+		claims, err := jwt_utils.ExtractClaims(accessToken, jwtra.SigningKey)
+		if err != nil {
+			log.Println("could not extract claims:", err)
+			return err
+		}
+
+		role := claims["role"]
+		ok, err := jwtra.enforcer.Enforce(role, ctx.Path(), ctx.Method())
+		if err != nil {
+			log.Println("could not enforce:", err)
+			return err
+		}
+
+		if !ok {
+			err = ctx.SendStatus(http.StatusForbidden)
+			if err != nil {
+				return err
+			}
+			return ctx.JSON(fiber.Map{
+				"message": "You are not authorized to access this resource",
+			})
+		}
+
+		return ctx.Next()
+	}
+}
