@@ -7,6 +7,6 @@ import (
 
 func setupFileRouter(api fiber.Router, c controller.FileController) {
 	place := api.Group("/file")
-	place.Post("", c.UploadImage)
-	place.Get("/:id", c.GetFileByID)
+	place.Post("/image", c.UploadImage)
+	place.Get("/image/:id", c.GetFileByID)
 }

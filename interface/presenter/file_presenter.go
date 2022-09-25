@@ -10,7 +10,7 @@ type filePresenter struct {
 
 type FilePresenter interface {
 	UploadImage(file *model.File) (any, error)
-	GetFileByID(id uint) (any, error)
+	GetFileByID(id string) (any, error)
 }
 
 func NewFilePresenter() presenter.FilePresenter {
@@ -24,7 +24,7 @@ func (f *filePresenter) UploadImage(file *model.File) (any, error) {
 	}, nil
 }
 
-func (f *filePresenter) GetFileByID(id uint) (any, error) {
+func (f *filePresenter) GetFileByID(string) (any, error) {
 	var file model.File
 	return map[string]interface{}{
 		"file_path": file.Path,

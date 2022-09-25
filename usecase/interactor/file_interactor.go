@@ -13,7 +13,7 @@ type fileInteractor struct {
 
 type FileInteractor interface {
 	UploadImage(file *model.File) (any, error)
-	GetFileByID(id uint) (*model.File, error)
+	GetFileByID(id string) (*model.File, error)
 }
 
 func NewFileInteractor(r repository.FileRepository, p presenter.FilePresenter) FileInteractor {
@@ -28,6 +28,6 @@ func (c *fileInteractor) UploadImage(file *model.File) (any, error) {
 	return c.presenter.UploadImage(file)
 }
 
-func (c *fileInteractor) GetFileByID(id uint) (*model.File, error) {
+func (c *fileInteractor) GetFileByID(id string) (*model.File, error) {
 	return c.repository.GetFileByID(id)
 }

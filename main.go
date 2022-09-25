@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"log"
+	"github.com/rs/zerolog"
 	"os"
 	_ "taveler/docs"
 	"taveler/infrastructure/datastore"
@@ -30,8 +30,10 @@ func main() {
 		panic(err)
 		return
 	}
+	log := zerolog.New(os.Stdout).With().Timestamp().Logger()
 	reg := &registry.Registry{
-		DB: db,
+		DB:     db,
+		Logger: log,
 	}
 	router.SetupRouter(app, reg.NewAppController())
 
@@ -46,7 +48,7 @@ func main() {
 	}))
 
 	if err != nil {
-		log.Fatal("Could not initialize JWT Role Authorizer")
+		log.Fatal().Err(err).Msg("failed to start server")
 	}
 
 	base := os.Getenv("APP_ADDR")

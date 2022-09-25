@@ -30,7 +30,7 @@ func NewFileController(i interactor.FileInteractor) FileController {
 
 func (f *fileController) UploadImage(ctx *fiber.Ctx) error {
 	fileModel := model.File{}
-	header, err := ctx.FormFile("file")
+	header, err := ctx.FormFile("image")
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"message": "failed to generate uuid",
@@ -60,26 +60,23 @@ func (f *fileController) UploadImage(ctx *fiber.Ctx) error {
 			"message": "failed to write file",
 		})
 	}
-	fileModel.Path = ctx.Protocol() + "://" + ctx.Hostname() + "/public/" + fileName
+	//fileModel.Path = ctx.Protocol() + "://" + ctx.Hostname() + "/public/" + fileName
+	fileModel.Path = "./public/" + fileName
 	res, err := f.interactor.UploadImage(&fileModel)
 	return ctx.Status(http.StatusOK).JSON(res)
 }
 
 func (f *fileController) GetFileByID(ctx *fiber.Ctx) error {
-	id, err := ctx.ParamsInt("id", 0)
-	if err != nil {
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": "failed to generate uuid",
-		})
-	}
-	imagePath, err := f.interactor.GetFileByID(uint(id))
+	id := ctx.Params("id")
+
+	imagePath, err := f.interactor.GetFileByID(id)
 
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"message": "failed to generate uuid111",
 		})
 	}
-	img, err := utils.GetImageInStorage("./public/" + imagePath.Path)
+	img, err := utils.GetImageInStorage(imagePath.Path)
 	if err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"message": "failed to generate uuid",

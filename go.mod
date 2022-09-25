@@ -55,6 +55,7 @@ require (
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
@@ -65,6 +66,7 @@ require (
 	github.com/muesli/termenv v0.12.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
+	github.com/rs/zerolog v1.28.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/spf13/cobra v1.5.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
