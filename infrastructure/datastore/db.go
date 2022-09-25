@@ -15,10 +15,14 @@ func SetupDB() (*gorm.DB, error) {
 	//dbConfig := config.DatabaseConfig{}
 	//dialector = postgres.Open(dbConfig.GetDSN())
 	dialector = sqlite.Open("taveler.db")
-	db, err := gorm.Open(dialector, &gorm.Config{
-		//uuid support
+	db, err := gorm.Open(dialector, &gorm.Config{})
+	//permify, _ := permifry.New(permifry.Options{
+	//	Migrate: true,
+	//	DB:      db,
+	//})
+	//err = permify.CreateRole("admin", "admin")
+	//err = permify.CreatePermission("admin", "control all data")
 
-	})
 	if err != nil {
 		return nil, err
 	}
@@ -30,5 +34,5 @@ func SetupDB() (*gorm.DB, error) {
 }
 
 func migrate(db *gorm.DB) error {
-	return db.AutoMigrate(model.Place{}, model.Category{}, model.Image{}, model.User{})
+	return db.AutoMigrate(model.File{}, model.Place{}, model.Category{}, model.Image{}, model.User{})
 }

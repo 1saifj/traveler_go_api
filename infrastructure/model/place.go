@@ -10,6 +10,7 @@ type Place struct {
 	Longitude float64 ` json:"longitude" form:"longitude" gorm:"type:float;not null"`
 	Address   string  `json:"address" gorm:"type:varchar(100);not null" `
 
+	ImageId  string   `json:"image_id" gorm:"type:varchar(255);not null"`
 	Slug     string   `json:"slug" gorm:"type:varchar(100);not null"`
 	Likes    int      `json:"likes"  gorm:"type:int(10);"`
 	Category Category `gorm:"foreignKey:CategoryID;constraint:onUpdate:CASCADE,onDelete:CASCADE" json:"category"`
