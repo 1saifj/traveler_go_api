@@ -62,3 +62,28 @@ func NewAuthorizer(jwtra *JWTRoleAuthorizer) fiber.Handler {
 		return ctx.Next()
 	}
 }
+
+func isAuthenticated(ctx fiber.Ctx) bool {
+	authHeader := ctx.Get("Authorization")
+	if authHeader == "" {
+		log.Printf("Access token not found")
+		return false
+	}
+	//tokenParts := strings.Split(authHeader, "Bearer ")
+	//bearerToken := tokenParts[1]
+	toValidate := map[string]string{}
+	toValidate["aud"] = "api://default"
+
+	//TODO: add validation for token
+	//verifier := jwtverifier.JwtVerifier{
+	//	Issuer:           os.Getenv("OKTA_OAUTH2_ISSUER"),
+	//	ClaimsToValidate: toValidate,
+	//}
+	//_, err := verifier.New().VerifyAccessToken(bearerToken)
+	//
+	//if err != nil {
+	//	log.Printf("Validation failed: %s", err.Error())
+	//	return false
+	//}
+	return true
+}
