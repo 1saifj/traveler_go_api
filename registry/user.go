@@ -10,7 +10,7 @@ import (
 )
 
 func (r *Registry) NewUserController() controller.UserController {
-	return controller.NewUserController(r.NewUserInteractor())
+	return controller.NewUserController(r.NewUserInteractor(), r.Token)
 
 }
 

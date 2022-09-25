@@ -25,6 +25,21 @@ type User struct {
 	Password           string    `json:"-" gorm:"not null"`
 	LastLogin          time.Time `json:"last_login,omitempty" gorm:"default:CURRENT_TIMESTAMP"`
 	LastPasswordChange time.Time `json:"last_password_change,omitempty" gorm:"default:CURRENT_TIMESTAMP"`
+	Tokens             Tokens    `json:"tokens,omitempty" gorm:"-"`
+}
+
+type Tokens struct {
+	AccessToken           string `json:"access_token"`
+	RefreshToken          string `json:"refresh_token"`
+	AccessTokenExpiresAt  int64  `json:"access_token_expires_at"`
+	RefreshTokenExpiresAt int64  `json:"refresh_token_expires_at"`
+}
+
+func (u *User) GetUserId() string {
+	if u.ID != "" {
+		return u.ID
+	}
+	return "NO_ID"
 }
 
 func (u *User) IsAdmin() bool {
@@ -41,8 +56,7 @@ func (u *User) ChangePassword(hash string) {
 	u.LastPasswordChange = time.Now()
 }
 
-// UpdateLastLogin updates last login field
-func (u *User) UpdateLastLogin(token string) {
-	u.Token = token
-	u.LastLogin = time.Now()
-}
+//// UpdateLastLogin updates last login field
+//func (u *User) UpdateLastLogin(accessToken string) {
+//	u.LastLogin = time.Now()
+//}

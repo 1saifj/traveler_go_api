@@ -12,7 +12,9 @@ type userRepository struct {
 type UserRepository interface {
 	FindAll() ([]*model.User, error)
 	FindByID(id int) (*model.User, error)
+	FindByEmail(string) (*model.User, error)
 	CreateUser(user *model.User) (*model.User, error)
+	Login(user *model.User) (*model.User, error)
 	UpdateUser(user *model.User) (*model.User, error)
 	DeleteUser(id int) error
 	UserExists(email string) (bool, error)
@@ -40,8 +42,25 @@ func (u *userRepository) FindByID(id int) (*model.User, error) {
 	return &user, nil
 }
 
+func (u *userRepository) FindByEmail(email string) (*model.User, error) {
+	var user model.User
+	err := u.db.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (u *userRepository) CreateUser(user *model.User) (*model.User, error) {
 	err := u.db.Create(user).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (u *userRepository) Login(user *model.User) (*model.User, error) {
+	err := u.db.Where("email = ?", user.Email).First(user).Error
 	if err != nil {
 		return nil, err
 	}

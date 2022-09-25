@@ -13,11 +13,13 @@ type userInteractor struct {
 
 type UserInteractor interface {
 	FindAll() ([]*model.User, error)
-	FindByID(id int) (*model.User, error)
-	CreateUser(user *model.User) (*model.User, error)
-	UpdateUser(user *model.User) (*model.User, error)
-	DeleteUser(id int) error
-	UserExists(email string) (bool, error)
+	FindByID(int) (*model.User, error)
+	FindByEmail(string) (*model.User, error)
+	CreateUser(*model.User) (any, error)
+	Login(*model.User) (any, error)
+	UpdateUser(*model.User) (*model.User, error)
+	DeleteUser(int) error
+	UserExists(string) (bool, error)
 }
 
 func NewUserInteractor(r repository.UserRepository, p presenter.UserPresenter) UserInteractor {
@@ -35,12 +37,24 @@ func (c *userInteractor) FindByID(id int) (*model.User, error) {
 	return c.repository.FindByID(id)
 }
 
-func (c *userInteractor) CreateUser(user *model.User) (*model.User, error) {
+func (c *userInteractor) FindByEmail(email string) (*model.User, error) {
+	return c.repository.FindByEmail(email)
+}
+
+func (c *userInteractor) CreateUser(user *model.User) (any, error) {
 	user, err := c.repository.CreateUser(user)
 	if err != nil {
 		return nil, err
 	}
-	return c.presenter.ResponseUser(user)
+	return c.presenter.ResponseRegisterUser(user), nil
+}
+
+func (c *userInteractor) Login(user *model.User) (any, error) {
+	user, err := c.repository.Login(user)
+	if err != nil {
+		return nil, err
+	}
+	return c.presenter.ResponseLoginUser(user), nil
 }
 
 func (c *userInteractor) UpdateUser(user *model.User) (*model.User, error) {

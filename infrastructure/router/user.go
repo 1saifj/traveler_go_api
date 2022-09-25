@@ -7,5 +7,6 @@ import (
 
 func setupUserRouter(api fiber.Router, c controller.UserController) {
 	place := api.Group("/user")
-	place.Post("/sign-up", c.CreateUser)
+	place.Post("/", c.CreateUser)
+	place.Post("/login", c.Login)
 }

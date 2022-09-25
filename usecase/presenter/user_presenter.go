@@ -1,7 +1,11 @@
 package presenter
 
-import "taveler/infrastructure/model"
+import (
+	"taveler/infrastructure/model"
+)
 
 type UserPresenter interface {
-	ResponseUser(*model.User) (*model.User, error)
+	ResponseUser(*model.User) any
+	ResponseRegisterUser(*model.User) any
+	ResponseLoginUser(*model.User) any
 }
